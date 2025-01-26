@@ -13,6 +13,10 @@ import keyboard
 
 # Load environment variables from .env file
 load_dotenv()
+ai_server_port = os.getenv("AI_SERVER_PORT")
+ai_server_ip = os.getenv("AI_SERVER_IP")
+chatdisplay_server_ip = os.getenv("CHATDISPLAY_SERVER_IP")
+chatdisplay_server_port = os.getenv("CHATDISPLAY_SERVER_PORT")
 
 # Fetch the OpenAI API key
 openai_api_key = os.getenv("OPENAI_API_KEY")
@@ -80,6 +84,7 @@ def record_audio():
             # Check for keypress to stop recording
             if keyboard.is_pressed('q'):  # Stop recording when 'q' is pressed
                 print("Key 'q' pressed. Stopping recording.")
+                recorder.stop()
                 break
 
         # Save the recorded audio to a WAV file
@@ -94,32 +99,39 @@ def record_audio():
     
     finally:
         recorder.stop()
-        recorder.delete()
 
 # Main function to handle user choice
 def main():
-    # Prompt user to enter input choice
-    print("Choose an option:")
-    print("1. Record a new audio file")
-    print("2. Transcribe an existing audio file")
-    choice = input("Enter your choice (1/2): ").strip()
+    while True:
+        try:
+            # Prompt user to enter input choice
+            print("\nChoose an option:")
+            print("1. Record a new audio file")
+            print("2. Transcribe an existing audio file")
+            choice = input("Enter your choice (1/2): ").strip()
 
-    # Redirect as necessary
-    if choice == "1":
-        record_audio()
-    elif choice == "2":
-        file_path = input("Enter the path to the audio file: ").strip()
-        if os.path.exists(file_path):
-            transcribe_audio(file_path)
-        else:
-            print(f"File not found: {file_path}")
-    else:
-        print("Invalid choice. Please enter 1 or 2.")
+            # Redirect as necessary
+            if choice == "1":
+                record_audio()
+            elif choice == "2":
+                file_path = input("Enter the path to the audio file: ").strip()
+                if os.path.exists(file_path):
+                    transcribe_audio(file_path)
+                else:
+                    print(f"File not found: {file_path}")
+            else:
+                print("Invalid choice. Please enter 1 or 2.")
 
-channel = grpc.insecure_channel('10.242.149.215:50051')
+        except KeyboardInterrupt:
+            # Gracefully handle Ctrl+C
+            recorder.delete()
+            print("\nExiting program. Goodbye!")
+            break
+
+channel = grpc.insecure_channel(f'{ai_server_ip}:{ai_server_port}')
 stub = ai911dispatcher_pb2_grpc.MainServiceStub(channel)
 
-display_channel = grpc.insecure_channel('10.242.23.76:50051')
+display_channel = grpc.insecure_channel(f"{chatdisplay_server_ip}:{chatdisplay_server_port}")
 display_stub = ai911displaychatdisplay_pb2_grpc.Ai911DispatcherChatDisplayStub(display_channel)
 
 # Run the main function

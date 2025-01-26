@@ -3,7 +3,7 @@ from dotenv import load_dotenv#load dot ENV
 import os
 from openai import OpenAI
 import winsound
-
+from playsound import playsound
 
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
@@ -21,4 +21,8 @@ def tts(speach):
 
 
 #ts("I love texas a&m gig em ags")
-winsound.PlaySound("speech.wav", winsound.SND_FILENAME | winsound.SND_ASYNC)
+#winsound.PlaySound("speech.wav", winsound.SND_FILENAME | winsound.SND_ASYNC)
+path = r"C:\Users\baile\Documents\GitHub\tamuhack2025-ai911dispatcher\ai_agent\speech.mp3"
+normpath = os.path.normpath(path)
+playsound(normpath)
+
