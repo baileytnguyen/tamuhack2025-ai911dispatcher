@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package ai911displaychatdisplay;
+
+// Service definition
+service Ai911DispatcherChatDisplay {
+  rpc PublishMessage (PublishMessageRequest) returns (PublishMessageResponse);
+}
+
+// Request message
+message PublishMessageRequest {
+  string role = 1;
+  string contents = 2;
+  string time = 3;
+}
+
+// Response message
+message PublishMessageResponse {
+  string code = 1;
+}
