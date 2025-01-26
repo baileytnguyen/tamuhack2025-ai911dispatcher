@@ -172,6 +172,10 @@ class MainServiceServicer(ai911dispatcher_pb2_grpc.MainServiceServicer):
                         "status": "Open"
                     }
                     inserted_data = collection.insert_one(data_to_insert)
+                    
+                    # clear memory
+                    inputResponse = ""
+                    LLMResponse = ""
 
                 
                 
