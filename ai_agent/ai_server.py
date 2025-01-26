@@ -138,13 +138,16 @@ class MainServiceServicer(ai911dispatcher_pb2_grpc.MainServiceServicer):
                 print(f"Question to Ask: {parsed_data.get('question_to_ask')}")
                 print(f"Situation: {parsed_data.get('situation')}")
                 
-                # publish content to chat display
-                display_msg = ai911displaychatdisplay_pb2.PublishMessageRequest(role="Assistant",contents=parsed_data.get('question_to_ask'),time="latest")
-                display_success = display_stub.PublishMessage(display_msg)
+
                 
                 # if missing information, ask question, else if not, push to database
                 if parsed_data.get('missing_information').lower() == 'true':
                     print("Missing information found. Asking question...")
+                    
+                    # publish content to chat display
+                    display_msg = ai911displaychatdisplay_pb2.PublishMessageRequest(role="Assistant",contents=parsed_data.get('question_to_ask'),time="latest")
+                    display_success = display_stub.PublishMessage(display_msg)
+                    
                     # Call text to speech functionality
                     response = client.audio.speech.create(
                         model="tts-1",
@@ -153,9 +156,14 @@ class MainServiceServicer(ai911dispatcher_pb2_grpc.MainServiceServicer):
                     )
                     speech_file_path = tts(parsed_data.get('question_to_ask'))
                     file_path = os.path.normpath(speech_file_path)
-                    time.sleep(3)
+                    time.sleep(0)
                     playsound(file_path)
                 elif (parsed_data.get('missing_information').lower() == 'false'):
+                    
+                    # publish content to chat display
+                    display_msg = ai911displaychatdisplay_pb2.PublishMessageRequest(role="Assistant",contents="AI has enough information",time="latest")
+                    display_success = display_stub.PublishMessage(display_msg)
+                    
                     # Create a dictionary with the collected data, including the serial ID
                     serial_id = get_next_serial_id()
                     data_to_insert = {
@@ -177,8 +185,6 @@ class MainServiceServicer(ai911dispatcher_pb2_grpc.MainServiceServicer):
                     inputResponse = ""
                     LLMResponse = ""
 
-                
-                
             else:
                 print("No messages received.")
         else:

@@ -53,8 +53,8 @@ def transcribe_audio(audio_filename):
             file=audio_file
         )
         # Create the CallerResponse message with the transcript
-        response = ai911dispatcher_pb2.CallerResponse(Response=transcription.text)
         display_msg = ai911displaychatdisplay_pb2.PublishMessageRequest(role="User",contents=transcription.text,time="latest")
+        response = ai911dispatcher_pb2.CallerResponse(Response=transcription.text)
     # Send the message to the server
     try:
         success = stub.SendCallerResponse(response)
