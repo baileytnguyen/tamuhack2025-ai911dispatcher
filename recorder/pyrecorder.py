@@ -4,7 +4,8 @@ import os
 import grpc
 import ai911dispatcher_pb2_grpc
 import ai911dispatcher_pb2
-import whisper
+import ai911displaychatdisplay_pb2
+import ai911displaychatdisplay_pb2_grpc
 from openai import OpenAI
 from dotenv import load_dotenv
 from pvrecorder import PvRecorder
@@ -20,11 +21,6 @@ if not openai_api_key:
 
 # Initialize the OpenAI client
 client = OpenAI(api_key=openai_api_key)
-
-# Load the Whisper model securely
-def load_whisper_model(model_name="base"):
-    model = whisper.load_model(model_name)
-    return model
 
 # Initialize the recorder
 recorder = PvRecorder(device_index=-1, frame_length=512)
@@ -54,10 +50,11 @@ def transcribe_audio(audio_filename):
         )
         # Create the CallerResponse message with the transcript
         response = ai911dispatcher_pb2.CallerResponse(Response=transcription.text)
-
+        display_msg = ai911displaychatdisplay_pb2.PublishMessageRequest(role="User",contents=transcription.text,time="latest")
     # Send the message to the server
     try:
         success = stub.SendCallerResponse(response)
+        display_success = display_stub.PublishMessage(display_msg)
         print(f"Server response: {success.status}")
     except grpc.RpcError as e:
         print(f"Error sending response: {e.details()}")
@@ -121,6 +118,9 @@ def main():
 
 channel = grpc.insecure_channel('10.242.149.215:50051')
 stub = ai911dispatcher_pb2_grpc.MainServiceStub(channel)
+
+display_channel = grpc.insecure_channel('10.242.23.76:50051')
+display_stub = ai911displaychatdisplay_pb2_grpc.Ai911DispatcherChatDisplayStub(display_channel)
 
 # Run the main function
 main()

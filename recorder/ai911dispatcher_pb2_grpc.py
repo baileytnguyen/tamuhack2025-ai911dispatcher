@@ -5,7 +5,7 @@ import warnings
 
 import ai911dispatcher_pb2 as ai911dispatcher__pb2
 
-GRPC_GENERATED_VERSION = '1.70.0'
+GRPC_GENERATED_VERSION = '1.66.2'
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 
