@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package ai911dispatcher;
+
+// Define the User message
+message User {
+	string phoneNum = 1;
+}
+
+// Define the SuccessCode message
+message SuccessCode {
+    string status = 1;
+}
+
+// Define the CallerResponse message
+message CallerResponse {
+    string Response = 1;
+}
+
+
+// Define the Address message
+service MainService {
+	rpc InitiateSession (User) returns (SuccessCode);
+	rpc SendCallerResponse (CallerResponse) returns (SuccessCode);
+	rpc EndSession (User) returns (SuccessCode);
+}
